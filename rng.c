@@ -140,7 +140,6 @@ void rng_init(void){
 		altseed.subseeds[6] = pid_seed.lowest_byte;
 		altseed.subseeds[7] = (altseed.subseeds[4] ^ altseed.subseeds[5]);
 		splitmix_state = altseed.final;
-		//Aesthetically pleasing, isn't it? ^^
 	}
 	xoshiro_state[0] = splitmix64();
 	xoshiro_state[1] = splitmix64();

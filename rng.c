@@ -1,5 +1,7 @@
 //RNG functionality and initialization
-/* The xoshiro256+ and splitmix64 code was derived in 2020 by Aryeh Klempner <arayaydev@gmail.com> from code written in 2015 and 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org).
+/* The xoshiro256+ and splitmix64 code was derived in 2020 by Aryeh Klempner
+<arayaydev@gmail.com> from code written in 2015 and 2018 by David Blackman and
+Sebastiano Vigna (vigna@acm.org).
 To the extent possible under law, the author(s) have dedicated all copyright
 and related and neighboring rights to this software to the public domain
 worldwide. This software is distributed without any warranty.

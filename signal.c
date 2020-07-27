@@ -25,19 +25,19 @@ void handl_alrm(int sig){
 }
 
 void clean_exit(int sig){
-	if(isatty(STDIN_FILENO)) tcflush(STDIN_FILENO, TCIFLUSH);
-	if(isatty(STDOUT_FILENO)) tcdrain(STDOUT_FILENO);
-	if(isatty(STDERR_FILENO)) tcdrain(STDERR_FILENO);
+	if (isatty(STDIN_FILENO)) tcflush(STDIN_FILENO, TCIFLUSH);
+	if (isatty(STDOUT_FILENO)) tcdrain(STDOUT_FILENO);
+	if (isatty(STDERR_FILENO)) tcdrain(STDERR_FILENO);
 	_exit(EXIT_SUCCESS);
 }
 
 void chk_dbl(int sig){
-	if(!(sigflags & 0x01)){
+	if (!(sigflags & 0x01)){
 		sigflags |= 0x01;
 		alarm(1U);
 	}
 //Note that we only check # of this sig, so e.g. ^C^Z will stop.
-	else switch(sig){
+	else switch (sig){
 		case SIGINT:
 			clean_exit(sig);
 			break;
@@ -64,16 +64,16 @@ void register_handlers(void){//see `man sigaction` if confused
 	sigstruct.sa_flags = SA_RESTART;
 	sigstruct.sa_mask = blkmask;
 	sigstruct.sa_handler = handl_alrm;
-	if(sigaction(SIGALRM, &sigstruct, NULL) == -1) goto err;
+	if (sigaction(SIGALRM, &sigstruct, NULL) == -1) goto err;
 	sigstruct.sa_handler = clean_exit;
-	if(sigaction(SIGHUP, &sigstruct, NULL) == -1) goto err;
-	if(sigaction(SIGTERM, &sigstruct, NULL) == -1) goto err;
+	if (sigaction(SIGHUP, &sigstruct, NULL) == -1) goto err;
+	if (sigaction(SIGTERM, &sigstruct, NULL) == -1) goto err;
 	sigstruct.sa_handler = chk_dbl;
-	if(sigaction(SIGINT, &sigstruct, NULL) == -1) goto err;
-	if(sigaction(SIGQUIT, &sigstruct, NULL) == -1) goto err;
-	if(sigaction(SIGTSTP, &sigstruct, NULL) == -1) goto err;
-	if(srv_flags & 0x01) puts("All signal handlers set up successfully");
+	if (sigaction(SIGINT, &sigstruct, NULL) == -1) goto err;
+	if (sigaction(SIGQUIT, &sigstruct, NULL) == -1) goto err;
+	if (sigaction(SIGTSTP, &sigstruct, NULL) == -1) goto err;
+	if (srv_flags & 0x01) puts("All signal handlers set up successfully");
 	return;
-err:if(!(srv_flags & 0x02)) perror("Signal handler setup failed");
+err:if (!(srv_flags & 0x02)) perror("Signal handler setup failed");
 	exit(EXIT_FAILURE);
 }

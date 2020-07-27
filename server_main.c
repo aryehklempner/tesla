@@ -24,35 +24,35 @@ void register_handlers(void);
 void rng_init(void);
 
 static inline void argchk(int argc, char* argv[]){
-	for(int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
-		if(!strncmp((const char*) argv[i], "-h", 2) ||
+	for (int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
+		if (!strncmp((const char*) argv[i], "-h", 2) ||
 		!strncmp((const char*) argv[i], "--help", 6)){
 			puts("Try \"info tesla\"");
 			exit(EXIT_SUCCESS);
 		}
-		else if(!strncmp((const char*) argv[i], "--version",
+		else if (!strncmp((const char*) argv[i], "--version",
 		9)){
 			puts("`tesla` is still in pre-alpha development");
 			exit(EXIT_SUCCESS);
 		}
-		else if(!strncmp((const char*) argv[i], "--loud", 6)){
+		else if (!strncmp((const char*) argv[i], "--loud", 6)){
 			srv_flags |= 0x01;
 		}
-		else if(!strncmp((const char*) argv[i], "--quiet", 7)){
+		else if (!strncmp((const char*) argv[i], "--quiet", 7)){
 			srv_flags |= 0x02;
 		}
 	}
 }
 
 static inline void parse_args(int argc, char* argv[]){
-	for(int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
-		if(!strncmp((const char*) argv[i], "--loud", 6)){
+	for (int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
+		if(!strncmp ((const char*) argv[i], "--loud", 6)){
 			continue;
 		}
-		else if(!strncmp((const char*) argv[i], "--quiet", 7)){
+		else if (!strncmp((const char*) argv[i], "--quiet", 7)){
 			continue;
 		}
-		else if(!(srv_flags & 0x02)){
+		else if (!(srv_flags & 0x02)){
 			printf("Unknown argument: ");
 			puts((const char*) argv[i]);
 			puts("Try `info tesla` for help");
@@ -61,9 +61,9 @@ static inline void parse_args(int argc, char* argv[]){
 }
 
 int main(int argc, char* argv[]){
-	if(argc > 1) argchk(argc, argv);
+	if (argc > 1) argchk(argc, argv);
 	register_handlers();
-	if(argc > 1) parse_args(argc, argv);
+	if (argc > 1) parse_args(argc, argv);
 	rng_init();
 	exit(EXIT_SUCCESS);
 }

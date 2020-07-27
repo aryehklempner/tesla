@@ -20,10 +20,10 @@ copy of the GPL with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <linux/version.h>//KERNEL_VERSION()
 #if((__GLIBC__ > 2 || __GLIBC_MINOR__ >= 25) && LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0))
 #include <sys/random.h>//getrandom()
-#define HAVE_GETRANDOM_IN_LIBC 1
+#define LIBC_HAS_GETRANDOM 1
 #else
 #include <sys/syscall.h>//syscall()
-#define HAVE_GETRANDOM_IN_LIBC 0
+#define LIBC_HAS_GETRANDOM 0
 #endif
 #include <stdint.h>
 #include <stdio.h>//perror(), puts()
@@ -35,7 +35,7 @@ copy of the GPL with this program. If not, see <http://www.gnu.org/licenses/>.
 
 static inline long getrandom_wrapper(void* buf){
 	long result;
-	#if(HAVE_GETRANDOM_IN_LIBC == 0)
+	#if (LIBC_HAS_GETRANDOM == 0)
 	result = syscall(SYS_getrandom, buf, 8, 0);
 	#else
 	result = (long)(getrandom(buf, 8, 0));
@@ -103,8 +103,8 @@ void xoshiro_jump(void) {
 	uint64_t s1 = 0;
 	uint64_t s2 = 0;
 	uint64_t s3 = 0;
-	for(int i = 0; i < sizeof jump_consts / sizeof *jump_consts; i++)
-		for(int b = 0; b < 64; b++) {
+	for (int i = 0; i < sizeof jump_consts / sizeof *jump_consts; i++)
+		for (int b = 0; b < 64; b++) {
 			if (jump_consts[i] & UINT64_C(1) << b) {
 				s0 ^= xoshiro_state[0];
 				s1 ^= xoshiro_state[1];
@@ -121,9 +121,9 @@ void xoshiro_jump(void) {
 
 void rng_init(void){
 	void* seedptr = &splitmix_state;
-	if(getrandom_wrapper(seedptr) == -1L){
+	if (getrandom_wrapper(seedptr) == -1L){
 		perror("Failed to seed RNG from preferred sources");
-		if(!(srv_flags & 0x02)) puts("WARNING: RNG seed is low quality");
+		if (!(srv_flags & 0x02)) puts("WARNING: RNG seed is low quality");
 		union foo time_seed;
 		union bar pid_seed;
 		union bar ppid_seed;
@@ -147,5 +147,5 @@ void rng_init(void){
 	xoshiro_state[1] = splitmix64();
 	xoshiro_state[2] = splitmix64();
 	xoshiro_state[3] = splitmix64();
-	if(srv_flags & 0x01) puts("RNG initialized successfully");
+	if (srv_flags & 0x01) puts("RNG initialized successfully");
 }

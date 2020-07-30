@@ -18,6 +18,7 @@ struct sensor {
 //we don't use enums in order to save space since this is C, not modern C++
 	uint8_t type;//general class e.g. radar
 	uint8_t role;//specific type e.g. TWR; this may become a uint16_t someday
+	uint8_t gen;//sensor generation
 };
 
 #endif

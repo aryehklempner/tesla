@@ -23,7 +23,7 @@ uint8_t srv_flags;
 void register_handlers(void);
 void rng_init(void);
 
-static inline void argchk(int argc, char* argv[]){
+static inline void argchk(int argc, char *argv[]){
 	for (int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
 		if (!strncmp((const char*) argv[i], "-h", 2) ||
 		!strncmp((const char*) argv[i], "--help", 6)){
@@ -44,7 +44,7 @@ static inline void argchk(int argc, char* argv[]){
 	}
 }
 
-static inline void parse_args(int argc, char* argv[]){
+static inline void parse_args(int argc, char *argv[]){
 	for (int i = 1; i < argc && i <= MAX_POSSIBLE_VALID_ARGC; i++){
 		if(!strncmp ((const char*) argv[i], "--loud", 6)){
 			continue;
@@ -60,7 +60,7 @@ static inline void parse_args(int argc, char* argv[]){
 	}
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char *argv[]){
 	if (argc > 1) argchk(argc, argv);
 	register_handlers();
 	if (argc > 1) parse_args(argc, argv);

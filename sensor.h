@@ -13,12 +13,12 @@ have received a copy of the GPL with this program. If not, see
 #define TESLA_SENSOR_H
 #include <stdint.h>
 
-struct sensor {
+typedef struct {
 	char* name;//the char-array is dynamically allocated
 //we don't use enums in order to save space since this is C, not modern C++
 	uint8_t type;//general class e.g. radar
 	uint8_t role;//specific type e.g. TWR; this may become a uint16_t someday
 	uint8_t gen;//sensor generation
-};
+} sensor;
 
 #endif

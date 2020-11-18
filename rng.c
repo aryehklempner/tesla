@@ -3,7 +3,7 @@
 <arayaydev@gmail.com> from code written in 2015 and 2018 by David Blackman and
 Sebastiano Vigna (vigna@acm.org).
 To the extent possible under law, the author(s) have dedicated all copyright
-and related and neighboring rights to this software to the public domain
+and related and neighboring rights to the original version to the public domain
 worldwide. This software is distributed without any warranty.
 See <http://creativecommons.org/publicdomain/zero/1.0/>.
 
@@ -27,7 +27,7 @@ copy of the GPL with this program. If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <stdint.h>
 #include <stdio.h>//perror(), puts()
-#include <stdlib.h>//NULL
+#include <stdlib.h>//NULL, exit()
 #include <time.h>//time()
 #include <unistd.h>//getpid(), getppid()
 
@@ -42,20 +42,6 @@ static inline long getrandom_wrapper(void* buf){
 	#endif
 	return result;
 }
-
-//for last-resort seeding
-union foo {
-	time_t time;
-	uint8_t lowest_byte;
-};
-union bar {
-	pid_t pid;
-	uint8_t lowest_byte;
-};
-union bix {
-	uint64_t final;
-	uint8_t subseeds[8];
-};
 
 extern uint8_t srv_flags;
 static uint64_t splitmix_state;
@@ -73,9 +59,9 @@ uint64_t splitmix64(void){
 }
 
 /* This is xoshiro256+ 1.0, our best and fastest generator for floating-point numbers. See http://prng.di.unimi.it/
-We suggest to use its upper bits for floating-point generation, as it is slightly faster than xoshiro256++/xoshiro256**. It passes all tests we are aware of except for the lowest three bits, which might fail linearity tests (and just those), so if low linear complexity is not considered an issue (as it is usually the case) it can be used to generate 64-bit outputs, too.
+We suggest using its upper bits for floating-point generation, as it is slightly faster than xoshiro256++/xoshiro256**. It passes all tests we are aware of except for the lowest three bits, which might fail linearity tests (and just those), so if low linear complexity is not considered an issue (as is usually the case) it can be used to generate 64-bit outputs, too.
 
-We suggest to use a sign test to extract a random Boolean value, and right shifts to extract subsets of bits.
+We suggest using a sign test to extract a random Boolean value, and right shifts to extract subsets of bits.
 
 The state must be seeded so that it is not everywhere zero. If you have a 64-bit seed, we suggest to seed a splitmix64 generator and use its output to fill s.
 */
@@ -96,7 +82,7 @@ uint64_t xoshiro256plus_next(void){
    to 2^128 calls to next(); it can be used to generate 2^128
    non-overlapping subsequences for parallel computations. */
 
-void xoshiro_jump(void) {
+/* void xoshiro_jump(void) {
 	static const uint64_t jump_consts[] = {0x180ec6d33cfd0aba,
 0xd5a61266f0c9392c, 0xa9582618e03fc9aa, 0x39abdc4529b1661c};
 	uint64_t s0 = 0;
@@ -117,31 +103,13 @@ void xoshiro_jump(void) {
 	xoshiro_state[1] = s1;
 	xoshiro_state[2] = s2;
 	xoshiro_state[3] = s3;
-}
+} */
 
 void rng_init(void){
 	void* seedptr = &splitmix_state;
 	if (getrandom_wrapper(seedptr) == -1L){
-		perror("Failed to seed RNG from preferred sources");
-		if (!(srv_flags & 0x02)) puts("WARNING: RNG seed is low quality");
-		union foo time_seed;
-		union bar pid_seed;
-		union bar ppid_seed;
-		time_seed.time = time(NULL);
-		pid_seed.pid = getpid();
-		/*getppid() can return 0 if the parent is in another namespace, but the 		likelihood of this occurring seems remote to me. Just make sure your
-		random char devices work if your system is configured that way.*/
-		ppid_seed.pid = getppid();
-		union bix altseed;
-		altseed.subseeds[0] = (pid_seed.lowest_byte ^ time_seed.lowest_byte);
-		altseed.subseeds[1] = (ppid_seed.lowest_byte ^ time_seed.lowest_byte);
-		altseed.subseeds[2] = (pid_seed.lowest_byte ^ ppid_seed.lowest_byte);
-		altseed.subseeds[3] = time_seed.lowest_byte;
-		altseed.subseeds[4] = (altseed.subseeds[0] ^ altseed.subseeds[2]);
-		altseed.subseeds[5] = (altseed.subseeds[1] ^ altseed.subseeds[2]);
-		altseed.subseeds[6] = pid_seed.lowest_byte;
-		altseed.subseeds[7] = (altseed.subseeds[4] ^ altseed.subseeds[5]);
-		splitmix_state = altseed.final;
+		perror("Failed to seed RNG, please examine your /dev/urandom");
+		exit(EXIT_FAILURE);
 	}
 	xoshiro_state[0] = splitmix64();
 	xoshiro_state[1] = splitmix64();
